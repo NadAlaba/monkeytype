@@ -348,7 +348,7 @@ jobs:
     if: ${{ always() && contains(needs.*.result, 'failure') && github.ref != 'refs/heads/master' }}
     steps:
       - name: dump full conditional
-        run: echo ${{ always() && contains(needs.*.result, 'failure') && github.ref != 'refs/heads/master' }}
+        run: echo ${{ contains(needs.*.result, 'failure') && github.ref != 'refs/heads/master' }}
 
       - name: dump always conditional
         run: echo ${{ always() }}
