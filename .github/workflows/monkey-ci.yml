@@ -350,9 +350,6 @@ jobs:
       - name: dump full conditional
         run: echo ${{ contains(needs.*.result, 'failure') && github.ref != 'refs/heads/master' }}
 
-      - name: dump always conditional
-        run: echo ${{ always() }}
-
       - name: dump contains conditional
         run: echo ${{ contains(needs.*.result, 'failure') }}
 
