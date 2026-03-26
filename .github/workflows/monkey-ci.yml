@@ -62,14 +62,14 @@ jobs:
         id: anticheat-changes
         if: steps.filter.outputs.anti-cheat == 'true' && !contains(github.event.pull_request.labels.*.name, 'force-ci') && !contains(github.event.pull_request.labels.*.name, 'force-full-ci')
         run: |
-          echo "anticheat-changes=${{ steps.filter.outputs.anti-cheat }}" >> $GITHUB_OUTPUT
+          echo "anticheat-changes=true" >> $GITHUB_OUTPUT
           exit 1
 
       - name: Check Workflow Changes
         id: workflow-changes
         if: steps.filter.outputs.workflows == 'true' && !contains(github.event.pull_request.labels.*.name, 'force-ci') && !contains(github.event.pull_request.labels.*.name, 'force-full-ci')
         run: |
-          echo "workflow-changes=${{ steps.filter.outputs.workflows }}" >> $GITHUB_OUTPUT
+          echo "workflow-changes=true" >> $GITHUB_OUTPUT
           exit 1
 
       - name: Export changes
@@ -348,22 +348,39 @@ jobs:
     if: ${{ always() && contains(needs.*.result, 'failure') && github.ref != 'refs/heads/master' }}
     steps:
       - name: dump pre-ci job
-        run: echo ${{ needs.pre-ci }}
+        env:
+          JOB: ${{ toJSON(needs.pre-ci) }}
+        run: echo "$JOB"
 
       - name: dump ci-be job
-        run: echo ${{ needs.ci-be }}
+        env:
+          JOB: ${{ toJSON(needs.ci-be) }}
+        run: echo "$JOB"
 
       - name: dump ci-fe job
-        run: echo ${{ needs.ci-fe }}
+        env:
+          JOB: ${{ toJSON(needs.ci-fe) }}
+        run: echo "$JOB"
 
       - name: dump ci-assets job
-        run: echo ${{ needs.ci-assets }}
+        env:
+          JOB: ${{ toJSON(needs.ci-assets) }}
+        run: echo "$JOB"
 
       - name: dump ci-pkg job
-        run: echo ${{ needs.ci-pkg }}
+        env:
+          JOB: ${{ toJSON(needs.ci-pkg) }}
+        run: echo "$JOB"
+
+      - name: dump variable
+        run: |
+          echo ${{ needs.pre-ci.outputs.workflow-changes }}
+          echo ${{ needs.pre-ci.outputs.anticheat-changes }}
 
       - name: dump github context
-        run: echo ${{ github }}
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
       - name: Save the PR number in an artifact
         shell: bash
