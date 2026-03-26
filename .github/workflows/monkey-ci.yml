@@ -344,13 +344,29 @@ jobs:
   on-failure:
     name: on-failure
     runs-on: ubuntu-latest
-    needs: [pre-ci, ci-be, ci-fe, ci-assets, ci-pkg]
+    needs: [ci-be, ci-fe, ci-assets, ci-pkg]
     if: ${{ always() && contains(needs.*.result, 'failure') && github.ref != 'refs/heads/master' }}
     steps:
-      - name: dump pre-ci job
-        env:
-          JOB: ${{ toJSON(needs.pre-ci) }}
-        run: echo "$JOB"
+      - name: dump full conditional
+        run: echo ${{ always() && contains(needs.*.result, 'failure') && github.ref != 'refs/heads/master' }}
+
+      - name: dump always conditional
+        run: echo ${{ always() }}
+
+      - name: dump contains conditional
+        run: echo ${{ contains(needs.*.result, 'failure') }}
+
+      - name: dump ci-be result conditional
+        run: echo ${{ needs.ci-be.result }}
+
+      - name: dump ci-fe result conditional
+        run: echo ${{ needs.ci-fe.result }}
+
+      - name: dump ci-assets conditional
+        run: echo ${{ needs.ci-assets.result }}
+
+      - name: dump ci-pkg conditional
+        run: echo ${{ needs.ci-pkg.result }}
 
       - name: dump ci-be job
         env:
@@ -372,10 +388,10 @@ jobs:
           JOB: ${{ toJSON(needs.ci-pkg) }}
         run: echo "$JOB"
 
-      - name: dump variable
-        run: |
-          echo ${{ needs.pre-ci.outputs.workflow-changes }}
-          echo ${{ needs.pre-ci.outputs.anticheat-changes }}
+      #      - name: dump variable
+      #        run: |
+      #          echo ${{ needs.pre-ci.outputs.workflow-changes }}
+      #          echo ${{ needs.pre-ci.outputs.anticheat-changes }}
 
       - name: dump github context
         env:
